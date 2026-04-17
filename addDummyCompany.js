@@ -10,7 +10,7 @@ connectDB();
 
 // Dummy data for a company
 const dummyCompany = {
-    company_id: "COMP001",
+    company_id: "COMP002",
     name: "FinSecure",
     industry: "Fintech",
     region: "India",

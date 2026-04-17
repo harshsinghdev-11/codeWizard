@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const dns = require('dns');
+const dnsServers = process.env.DNS_SERVERS
+  ? process.env.DNS_SERVERS.split(',').map((server) => server.trim()).filter(Boolean)
+  : ['8.8.8.8', '1.1.1.1'];
 
+dns.setServers(dnsServers);
 dotenv.config();
 const connectDB = async () => {
     try {
