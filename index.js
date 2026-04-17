@@ -11,11 +11,17 @@ app.use(cors());
 app.use(express.json());
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const WordExtractor = require('word-extractor');
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_123';
 
+const upload = multer({ storage: multer.memoryStorage() });
+
 const feedToCompanyRouter = require('./feedToCompany');
+const aiAgentRouter = require('./aiAgentRouter');
 connectDB();
 app.use('/feed', feedToCompanyRouter);
+app.use('/api/agent', aiAgentRouter);
 
 app.post("/registerCompany", async (req, res) => {
     try {
@@ -79,38 +85,40 @@ app.post("/login", async (req, res) => {
     }
 });
 
-app.post("/api/analyze-gap", async (req, res) => {
+app.post("/api/documents/upload", upload.single('document'), async (req, res) => {
     try {
-        const { feed_id } = req.body;
-        if (!feed_id) {
-            return res.status(400).json({ message: "feed_id is required" });
+        const { company_id, title, type, owner, text_content } = req.body;
+        
+        if (!company_id) return res.status(400).json({ message: "Company ID is required" });
+        if (!title || !type || !owner) return res.status(400).json({ message: "Title, type, and owner are required" });
+
+        let finalContent = text_content || "";
+
+        if (req.file) {
+            const ext = req.file.originalname.split('.').pop().toLowerCase();
+            if (ext === 'doc' || ext === 'docx') {
+                const extractor = new WordExtractor();
+                const extracted = await extractor.extract(req.file.buffer);
+                finalContent = extracted.getBody();
+            } else if (ext === 'txt') {
+                finalContent = req.file.buffer.toString('utf-8');
+            } else {
+                return res.status(400).json({ message: "Unsupported file type. Only .doc, .docx, and .txt are supported." });
+            }
         }
 
-        const feed = await RegulatoryFeed.findOne({ feed_id });
-        if (!feed) return res.status(404).json({ message: "Feed not found" });
-
-        const documents = await InternalDocument.find({ related_regulation: feed.related_regulation });
-
-        let documentContent = documents.length > 0
-            ? documents.map(doc => `Document Title: ${doc.title}\nContent:\n${doc.content}`).join('\n\n')
-            : "No internal documents are currently implemented for this regulation.";
+        if (!finalContent || finalContent.trim().length === 0) {
+            return res.status(400).json({ message: "Document content cannot be empty." });
+        }
 
         const prompt = `
-You are a senior compliance officer and AI auditor.
-Provide a step-by-step guide and gap analysis comparing the new regulatory guidance against our current internal documents.
+You are a senior compliance officer.
+Read the following internal policy document and determine the SINGLE most relevant major regulation it is designed to comply with (e.g., "GDPR", "HIPAA", "CCPA", "PSD2", "PCI-DSS").
+If it relates to data privacy, it might be GDPR. If healthcare, HIPAA. If banking, PSD2.
+Respond ONLY with the name of the regulation. Do not provide any explanation or extra text.
 
-New Regulatory Guidance:
-Title: ${feed.title}
-Summary: ${feed.summary}
-Key Changes: ${feed.key_changes.join(', ')}
-
-Current Internal Documents Status:
-${documentContent}
-
-Provide a structured, professional Markdown report containing:
-1. **Executive Summary**: Brief overview of the impact.
-2. **Identified Gaps**: Bullet points of what is missing or non-compliant in our current documents.
-3. **Step-by-step Guide**: Clear, actionable, step-by-step recommendations on exactly what sections to update to achieve compliance.
+Document Content:
+${finalContent.substring(0, 10000)}
 `;
 
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -119,10 +127,39 @@ Provide a structured, professional Markdown report containing:
             contents: prompt,
         });
 
-        res.json({ report: response.text });
+        let relatedRegulation = response.text.trim();
+        if (relatedRegulation.length > 30) {
+            relatedRegulation = "General Compliance";
+        }
+
+        const doc_id = `DOC-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        const company = await Company.findOne({ company_id });
+        if (!company) return res.status(404).json({ message: "Company not found" });
+
+        const newDoc = new InternalDocument({
+            doc_id,
+            title,
+            type,
+            related_regulation: relatedRegulation,
+            content: finalContent,
+            last_updated: new Date(),
+            owner,
+            company_ids: [company._id],
+            status: "Active"
+        });
+
+        await newDoc.save();
+
+        company.documents_implemented.push(newDoc._id);
+        await company.save();
+
+        res.status(201).json({ 
+            message: "Document uploaded and mapped successfully", 
+            document: newDoc 
+        });
     } catch (error) {
-        console.error("AI Analysis Error:", error);
-        res.status(500).json({ message: "Failed to generate AI analysis", error: error.message });
+        console.error("Document Upload Error:", error);
+        res.status(500).json({ message: "Failed to process document", error: error.message });
     }
 });
 
