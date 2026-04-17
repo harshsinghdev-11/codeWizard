@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Building2, Globe2, ShieldCheck, CheckCircle2, AlertCircle, Copy, X } from 'lucide-react';
+import { Building2, ShieldCheck, CheckCircle2, AlertCircle, Copy, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const RegisterCompany = () => {
@@ -18,7 +18,6 @@ const RegisterCompany = () => {
   });
 
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
   const [generatedCompanyId, setGeneratedCompanyId] = useState(null);
   const [error, setError] = useState(null);
@@ -51,16 +50,16 @@ const RegisterCompany = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto pb-12 relative">
-      <div className="mb-8">
-        <h2 className="text-3xl font-normal text-[var(--color-foreground)] tracking-tight mb-2">Register Entity</h2>
-        <p className="text-secondary text-base">Create an account to track your compliance updates.</p>
+    <div className="max-w-3xl mx-auto pb-12 relative">
+      <div className="mb-10 text-center">
+        <h2 className="text-3xl font-semibold text-[var(--color-text-primary)] tracking-tight mb-3">Create your entity</h2>
+        <p className="text-[var(--color-text-secondary)] text-sm md:text-base max-w-lg mx-auto">Set up your compliance profile to automatically track and map regulatory updates against your internal policies.</p>
       </div>
 
-      <div className="google-card bg-white p-8 md:p-10">
+      <div className="saas-card bg-white p-6 md:p-10">
         {error && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} 
-            className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+            className="mb-8 p-4 bg-red-50/50 border border-red-100 rounded-lg flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
             <div>
               <h4 className="text-sm font-medium text-red-900">Registration Failed</h4>
@@ -73,32 +72,32 @@ const RegisterCompany = () => {
           
           {/* Section: Basic Info */}
           <div>
-            <h3 className="text-lg font-medium text-[var(--color-foreground)] border-b border-[var(--color-border)] pb-2 mb-6 flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-secondary" /> Account Information
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] pb-3 border-b border-[var(--color-border-default)] mb-5">
+              Account Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="google-label">Company Name</label>
+                <label className="saas-label">Company Name</label>
                 <input required type="text" name="name" value={formData.name} onChange={handleChange} 
-                  placeholder="e.g. Acme Corp" className="google-input" />
+                  placeholder="e.g. Acme Corp" className="saas-input" />
               </div>
               <div>
-                <label className="google-label">Secure Password</label>
+                <label className="saas-label">Secure Password</label>
                 <input required type="password" name="password" value={formData.password} onChange={handleChange} 
-                  placeholder="••••••••" className="google-input" />
+                  placeholder="••••••••" className="saas-input" />
               </div>
             </div>
           </div>
 
           {/* Section: Operational Details */}
           <div>
-            <h3 className="text-lg font-medium text-[var(--color-foreground)] border-b border-[var(--color-border)] pb-2 mb-6 flex items-center gap-2 mt-8">
-              <Globe2 className="w-5 h-5 text-secondary" /> Operational Details
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] pb-3 border-b border-[var(--color-border-default)] mb-5 mt-8">
+              Operational Details
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="google-label">Industry</label>
-                <select required name="industry" value={formData.industry} onChange={handleChange} className="google-input bg-white">
+                <label className="saas-label">Industry</label>
+                <select required name="industry" value={formData.industry} onChange={handleChange} className="saas-input">
                   <option value="" disabled>Select Industry</option>
                   <option value="Fintech">Fintech</option>
                   <option value="Banking">Banking</option>
@@ -108,8 +107,8 @@ const RegisterCompany = () => {
                 </select>
               </div>
               <div>
-                <label className="google-label">Region</label>
-                <select required name="region" value={formData.region} onChange={handleChange} className="google-input bg-white">
+                <label className="saas-label">Region</label>
+                <select required name="region" value={formData.region} onChange={handleChange} className="saas-input">
                   <option value="" disabled>Select Region</option>
                   <option value="North America">North America</option>
                   <option value="Europe">Europe</option>
@@ -119,8 +118,8 @@ const RegisterCompany = () => {
                 </select>
               </div>
               <div>
-                <label className="google-label">Company Size</label>
-                <select required name="company_size" value={formData.company_size} onChange={handleChange} className="google-input bg-white">
+                <label className="saas-label">Company Size</label>
+                <select required name="company_size" value={formData.company_size} onChange={handleChange} className="saas-input">
                   <option value="" disabled>Select Size</option>
                   <option value="1-50 employees">1-50 employees</option>
                   <option value="51-200 employees">51-200 employees</option>
@@ -129,22 +128,22 @@ const RegisterCompany = () => {
                 </select>
               </div>
               <div>
-                <label className="google-label">Services (comma separated)</label>
+                <label className="saas-label">Services (comma separated)</label>
                 <input required type="text" name="services" value={formData.services} onChange={handleChange} 
-                  placeholder="e.g. Payments, Lending, Wealth Management" className="google-input" />
+                  placeholder="e.g. Payments, Lending" className="saas-input" />
               </div>
             </div>
           </div>
 
           {/* Section: Compliance & Risk */}
           <div>
-            <h3 className="text-lg font-medium text-[var(--color-foreground)] border-b border-[var(--color-border)] pb-2 mb-6 flex items-center gap-2 mt-8">
-              <ShieldCheck className="w-5 h-5 text-secondary" /> Compliance & Risk Profile
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] pb-3 border-b border-[var(--color-border-default)] mb-5 mt-8">
+              Risk Profile
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="google-label">Transaction Volume</label>
-                <select required name="transaction_volume" value={formData.transaction_volume} onChange={handleChange} className="google-input bg-white">
+                <label className="saas-label">Transaction Volume</label>
+                <select required name="transaction_volume" value={formData.transaction_volume} onChange={handleChange} className="saas-input">
                   <option value="" disabled>Select Volume</option>
                   <option value="Low (< $1M/yr)">Low (&lt; $1M/yr)</option>
                   <option value="Medium ($1M - $50M/yr)">Medium ($1M - $50M/yr)</option>
@@ -152,31 +151,34 @@ const RegisterCompany = () => {
                 </select>
               </div>
               
-              <div className="flex flex-col justify-center space-y-4 md:mt-6">
+              <div className="flex flex-col justify-center space-y-3 md:mt-6 pl-1">
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <input type="checkbox" name="handles_user_data" checked={formData.handles_user_data} onChange={handleChange}
-                    className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" />
-                  <span className="text-sm font-medium text-[var(--color-foreground)] group-hover:text-blue-600 transition-colors">Handles Sensitive User Data</span>
+                    className="w-4 h-4 text-[var(--color-brand-primary)] border-[var(--color-border-default)] rounded focus:ring-[var(--color-brand-primary)] transition-colors" />
+                  <span className="text-sm text-[var(--color-text-primary)] group-hover:text-[var(--color-brand-primary)] transition-colors">Handles Sensitive User Data</span>
                 </label>
 
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <input type="checkbox" name="kyc_required" checked={formData.kyc_required} onChange={handleChange}
-                    className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" />
-                  <span className="text-sm font-medium text-[var(--color-foreground)] group-hover:text-blue-600 transition-colors">Requires KYC/AML Verification</span>
+                    className="w-4 h-4 text-[var(--color-brand-primary)] border-[var(--color-border-default)] rounded focus:ring-[var(--color-brand-primary)] transition-colors" />
+                  <span className="text-sm text-[var(--color-text-primary)] group-hover:text-[var(--color-brand-primary)] transition-colors">Requires KYC/AML Verification</span>
                 </label>
               </div>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-[var(--color-border)] flex items-center justify-end gap-4">
-            <Link to="/login" className="px-6 py-2.5 text-sm font-medium text-secondary hover:bg-[var(--color-surface-hover)] rounded transition-colors">
-              Cancel
+          <div className="pt-8 mt-8 border-t border-[var(--color-border-default)] flex items-center justify-between">
+            <Link to="/login" className="text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
+              Already have an account?
             </Link>
-            <button type="submit" disabled={loading} className="google-btn px-8 py-2.5 text-sm flex items-center gap-2">
+            <button type="submit" disabled={loading} className="saas-btn-primary px-8 py-2.5">
               {loading ? (
-                <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Registering...</>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> 
+                  <span>Registering...</span>
+                </div>
               ) : (
-                'Register Entity'
+                'Create account'
               )}
             </button>
           </div>
@@ -186,26 +188,26 @@ const RegisterCompany = () => {
       {/* Success Modal */}
       <AnimatePresence>
         {generatedCompanyId && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[var(--color-bg-base)]/80 backdrop-blur-sm p-4">
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }} 
-              animate={{ opacity: 1, scale: 1 }} 
-              className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 text-center"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              className="bg-white rounded-2xl shadow-modal border border-[var(--color-border-default)] w-full max-w-sm p-8 text-center"
             >
-              <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 className="w-8 h-8" />
+              <div className="w-14 h-14 bg-[var(--color-brand-primary-light)] text-[var(--color-brand-primary)] rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-7 h-7" />
               </div>
-              <h3 className="text-2xl font-medium text-[var(--color-foreground)] mb-2">Registration Successful!</h3>
-              <p className="text-secondary text-sm mb-6">Your entity has been securely registered. Please save your auto-generated Company ID below, as you will need it to log in.</p>
+              <h3 className="text-xl font-semibold tracking-tight text-[var(--color-text-primary)] mb-2">Entity Registered</h3>
+              <p className="text-[var(--color-text-secondary)] text-sm mb-8 leading-relaxed">Your compliance profile is active. Please save your auto-generated Company ID below, as you will need it to log in.</p>
               
-              <div className="bg-[var(--color-background)] border border-[var(--color-border)] rounded-lg p-4 flex items-center justify-between mb-8">
-                <span className="font-mono text-xl font-bold tracking-wider text-[var(--color-primary)]">{generatedCompanyId}</span>
-                <button onClick={copyToClipboard} className="p-2 hover:bg-gray-200 rounded text-secondary transition-colors" title="Copy to clipboard">
-                  <Copy className="w-5 h-5" />
+              <div className="bg-[var(--color-bg-base)] border border-[var(--color-border-default)] rounded-lg p-3 flex items-center justify-between mb-8 group hover:border-[var(--color-border-hover)] transition-colors">
+                <span className="font-mono text-lg font-bold tracking-wide text-[var(--color-text-primary)] px-2">{generatedCompanyId}</span>
+                <button onClick={copyToClipboard} className="p-2 bg-white border border-[var(--color-border-default)] hover:bg-[var(--color-bg-base)] rounded-md text-[var(--color-text-secondary)] transition-colors shadow-sm" title="Copy to clipboard">
+                  <Copy className="w-4 h-4" />
                 </button>
               </div>
 
-              <button onClick={() => navigate('/login')} className="google-btn w-full py-3 text-base">
+              <button onClick={() => navigate('/login')} className="saas-btn-black w-full py-2.5">
                 Proceed to Login
               </button>
             </motion.div>

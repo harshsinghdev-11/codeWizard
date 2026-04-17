@@ -1,98 +1,121 @@
 @import "tailwindcss";
 
-@theme {
-  --color-background: #f8f9fa;
-  --color-foreground: #202124;
-  --color-card: #ffffff;
-  --color-card-foreground: #202124;
-  --color-border: #dadce0;
-  --color-primary: #1a73e8;
-  --color-primary-foreground: #ffffff;
-  --color-success: #1e8e3e;
-  --color-warning: #f9ab00;
-  --color-danger: #d93025;
-  --color-surface-hover: #f1f3f4;
-  --color-text-secondary: #5f6368;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Crisp Light Theme Palette */
+  --color-bg-base: #FAFAFA;
+  --color-bg-card: #FFFFFF;
+  --color-bg-hover: #F3F4F6;
+  
+  --color-text-primary: #111827;
+  --color-text-secondary: #4B5563;
+  --color-text-tertiary: #9CA3AF;
+  
+  --color-border-subtle: #F3F4F6;
+  --color-border-default: #E5E7EB;
+  --color-border-hover: #D1D5DB;
+  
+  --color-brand-primary: #4F46E5; /* Indigo 600 */
+  --color-brand-primary-hover: #4338CA;
+  --color-brand-primary-light: #EEF2FF;
+  
+  --color-status-success: #10B981;
+  --color-status-success-bg: #ECFDF5;
+  --color-status-warning: #F59E0B;
+  --color-status-warning-bg: #FFFBEB;
+  --color-status-danger: #EF4444;
+  --color-status-danger-bg: #FEF2F2;
+
+  /* Refined Shadow System */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 }
 
-@layer base {
-  :root {
-    color-scheme: light;
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  /* Premium SaaS Card */
+  .saas-card {
+    @apply bg-white rounded-xl border border-[var(--color-border-default)] transition-all duration-200;
+    box-shadow: var(--shadow-sm);
   }
   
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  .saas-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Form Elements */
+  .saas-label {
+    @apply block text-sm font-medium text-[var(--color-text-secondary)] mb-1.5;
+  }
+
+  .saas-input {
+    @apply w-full rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-base)] px-3 py-2 text-sm text-[var(--color-text-primary)] transition-all duration-200 outline-none;
+  }
+
+  .saas-input:hover {
+    @apply border-[var(--color-border-hover)];
+  }
+
+  .saas-input:focus {
+    @apply border-[var(--color-brand-primary)] bg-white ring-4 ring-[var(--color-brand-primary-light)];
+  }
+
+  /* Buttons */
+  .saas-btn-primary {
+    @apply inline-flex justify-center items-center rounded-md bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 outline-none;
+  }
+  
+  .saas-btn-primary:hover:not(:disabled) {
+    @apply bg-[var(--color-brand-primary-hover)];
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  }
+
+  .saas-btn-primary:disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+
+  .saas-btn-black {
+    @apply inline-flex justify-center items-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow-sm transition-all duration-200 outline-none;
+  }
+  
+  .saas-btn-black:hover:not(:disabled) {
+    @apply bg-[#111827];
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .saas-btn-secondary {
+    @apply inline-flex justify-center items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] border border-[var(--color-border-default)] shadow-sm transition-all duration-200 outline-none;
+  }
+
+  .saas-btn-secondary:hover:not(:disabled) {
+    @apply bg-[var(--color-bg-hover)] text-[var(--color-text-primary)] border-[var(--color-border-hover)];
+  }
+
+  /* AI Magical Gradients */
+  .ai-gradient-bg {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border: 1px solid rgba(79, 70, 229, 0.1);
+  }
+
+  .ai-gradient-text {
+    background: linear-gradient(135deg, #4F46E5 0%, #8B5CF6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }
 
-/* Base utility classes for the new theme */
-.google-card {
-  background-color: var(--color-card);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
-  transition: box-shadow 0.2s ease-in-out;
-}
-
-.google-card:hover {
-  box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
-}
-
-.google-btn {
-  background-color: var(--color-primary);
-  color: var(--color-primary-foreground);
-  border-radius: 4px;
-  font-weight: 500;
-  transition: background-color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3);
-}
-
-.google-btn:hover {
-  background-color: #1557b0;
-  box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
-}
-
-.google-border {
-  border: 1px solid var(--color-border);
-}
-
-.google-border {
-  border: 1px solid var(--color-border);
-}
-
-.text-secondary {
-  color: var(--color-text-secondary);
-}
-
-.google-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-foreground);
-  margin-bottom: 0.5rem;
-}
-
-.google-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  background-color: var(--color-card);
-  color: var(--color-foreground);
-  font-size: 0.875rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.google-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
-}
-
-.google-input::placeholder {
-  color: #9aa0a6;
-}
+/* Custom Scrollbar for crisp look */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-hover); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
