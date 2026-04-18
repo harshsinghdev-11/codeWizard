@@ -24,9 +24,9 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const [feedResponse, docsResponse, actionsResponse] = await Promise.all([
-          axios.get('http://localhost:5000/feed/getFeeds').catch(() => ({ data: null })),
-          companyId ? axios.get(`http://localhost:5000/api/documents/${companyId}`).catch(() => ({ data: { documents: [] } })) : Promise.resolve({ data: { documents: [] } }),
-          companyId ? axios.get(`http://localhost:5000/api/action-items/${companyId}`).catch(() => ({ data: { action_items: [] } })) : Promise.resolve({ data: { action_items: [] } })
+          axios.get('https://codewizard-fpjx.onrender.com/feed/getFeeds').catch(() => ({ data: null })),
+          companyId ? axios.get(`https://codewizard-fpjx.onrender.com/api/documents/${companyId}`).catch(() => ({ data: { documents: [] } })) : Promise.resolve({ data: { documents: [] } }),
+          companyId ? axios.get(`https://codewizard-fpjx.onrender.com/api/action-items/${companyId}`).catch(() => ({ data: { action_items: [] } })) : Promise.resolve({ data: { action_items: [] } })
         ]);
 
         if (!feedResponse.data) {
@@ -58,7 +58,7 @@ const Dashboard = () => {
     try {
       if (!companyId) throw new Error("You must be logged in to run analysis.");
 
-      const response = await axios.post('http://localhost:5000/api/analyze-gap', {
+      const response = await axios.post('https://codewizard-fpjx.onrender.com/api/analyze-gap', {
         feed_id: feedItem.feed_id,
         company_id: companyId
       });
@@ -68,7 +68,7 @@ const Dashboard = () => {
 
       // Automatically persist action items to the dashboard
       if (report.action_items && report.action_items.length > 0) {
-        const saveRes = await axios.post(`http://localhost:5000/api/action-items/${companyId}`, {
+        const saveRes = await axios.post(`https://codewizard-fpjx.onrender.com/api/action-items/${companyId}`, {
           items: report.action_items,
           related_regulation: feedItem.related_regulation
         });
@@ -84,7 +84,7 @@ const Dashboard = () => {
 
   const dismissActionItem = async (itemId) => {
     try {
-      const res = await axios.delete(`http://localhost:5000/api/action-items/${companyId}/${itemId}`);
+      const res = await axios.delete(`https://codewizard-fpjx.onrender.com/api/action-items/${companyId}/${itemId}`);
       setActionItems(res.data.action_items);
     } catch (err) {
       console.error("Failed to dismiss item:", err);
