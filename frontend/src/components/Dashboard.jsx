@@ -481,10 +481,10 @@ const Dashboard = () => {
                           <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-1">Regulation</p>
                           <p className="text-sm font-semibold text-[var(--color-text-primary)]">{selectedFeed.related_regulation}</p>
                         </div>
-                        <div className="saas-card p-4 bg-white shadow-sm border-transparent">
+                        {/* <div className="saas-card p-4 bg-white shadow-sm border-transparent">
                           <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-1">Impacted Vault Docs</p>
                           <p className="text-sm font-semibold text-[var(--color-text-primary)]">{selectedFeedImpactedDocuments.length}</p>
-                        </div>
+                        </div> */}
                       </div>
                     )}
 

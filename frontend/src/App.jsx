@@ -46,9 +46,6 @@ function AppContent({ isAuthenticated, setAuthStatus }) {
         <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center font-bold text-white text-sm shadow-sm group-hover:shadow-md transition-all">
-                CW
-              </div>
               <span className="text-lg font-semibold tracking-tight text-[var(--color-text-primary)] group-hover:text-indigo-600 transition-colors">
                 Compliance Wizard
               </span>

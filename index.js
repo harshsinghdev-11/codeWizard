@@ -123,7 +123,7 @@ ${documentContent.substring(0, 30000)}
 You MUST output ONLY a valid, raw JSON object exactly matching this schema:
 {
   "executive_summary": "Overview of compliance impact.",
-  "compliance_score": 50,
+  "compliance_score": "number based on review",
   "critical_gaps": [
     { "section": "Section name", "issue": "What is missing", "severity": "High" }
   ],
@@ -136,7 +136,7 @@ If no documents exist, set compliance_score to 0, list the missing policies as c
 
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-3-flash-preview',
             contents: prompt,
         });
 
@@ -188,7 +188,7 @@ ${finalContent.substring(0, 10000)}
 
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-3-flash-preview',
             contents: prompt,
         });
 
