@@ -15,6 +15,12 @@ const companySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'InternalDocument'
     }],
+    pending_action_items: [{
+        document_title: String,
+        exact_change_instructions: String,
+        related_regulation: String,
+        created_at: { type: Date, default: Date.now }
+    }],
     last_compliance_check: { type: Date, required: true }
 });
 

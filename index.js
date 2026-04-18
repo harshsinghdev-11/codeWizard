@@ -18,10 +18,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_123';
 const upload = multer({ storage: multer.memoryStorage() });
 
 const feedToCompanyRouter = require('./feedToCompany');
-const aiAgentRouter = require('./aiAgentRouter');
 connectDB();
 app.use('/feed', feedToCompanyRouter);
-app.use('/api/agent', aiAgentRouter);
 
 app.post("/registerCompany", async (req, res) => {
     try {
@@ -85,6 +83,73 @@ app.post("/login", async (req, res) => {
     }
 });
 
+app.post("/api/analyze-gap", async (req, res) => {
+    try {
+        const { feed_id, company_id } = req.body;
+        if (!feed_id || !company_id) {
+            return res.status(400).json({ message: "feed_id and company_id are required" });
+        }
+
+        const feed = await RegulatoryFeed.findOne({ feed_id });
+        if (!feed) return res.status(404).json({ message: "Feed not found" });
+
+        const company = await Company.findOne({ company_id }).populate('documents_implemented');
+        if (!company) return res.status(404).json({ message: "Company not found" });
+
+        // Filter for documents that match the regulation, or fallback to all documents if the user wants general analysis
+        const relatedDocs = company.documents_implemented.filter(
+            doc => doc.related_regulation === feed.related_regulation
+        );
+
+        let documentContent = "";
+        if (relatedDocs.length === 0) {
+            documentContent = "NO INTERNAL DOCUMENTS FOUND. The company has not implemented any policies for this regulation.";
+        } else {
+            documentContent = relatedDocs.map(doc => `--- TITLE: ${doc.title} ---\n${doc.content}`).join('\n\n');
+        }
+
+        const prompt = `
+You are a senior compliance officer and rigorous AI auditor.
+Read the New Regulatory Guidance and strictly audit the provided Current Internal Documents.
+
+New Regulatory Guidance:
+Title: ${feed.title}
+Summary: ${feed.summary}
+Key Changes: ${feed.key_changes.join(', ')}
+
+Current Internal Documents Status:
+${documentContent.substring(0, 30000)}
+
+You MUST output ONLY a valid, raw JSON object exactly matching this schema:
+{
+  "executive_summary": "Overview of compliance impact.",
+  "compliance_score": 50,
+  "critical_gaps": [
+    { "section": "Section name", "issue": "What is missing", "severity": "High" }
+  ],
+  "action_items": [
+    { "document_title": "Title to update", "exact_change_instructions": "Exact text to add." }
+  ]
+}
+If no documents exist, set compliance_score to 0, list the missing policies as critical_gaps, and give action items to create them.
+`;
+
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const response = await ai.models.generateContent({
+            model: 'gemini-1.5-flash',
+            contents: prompt,
+        });
+
+        let jsonRaw = response.text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const data = JSON.parse(jsonRaw);
+
+        res.json({ data });
+    } catch (error) {
+        console.error("AI Analysis Error:", error);
+        res.status(500).json({ message: "Failed to run AI Agent analysis", error: error.message });
+    }
+});
+
 app.post("/api/documents/upload", upload.single('document'), async (req, res) => {
     try {
         const { company_id, title, type, owner, text_content } = req.body;
@@ -123,7 +188,7 @@ ${finalContent.substring(0, 10000)}
 
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-1.5-flash',
             contents: prompt,
         });
 
@@ -160,6 +225,68 @@ ${finalContent.substring(0, 10000)}
     } catch (error) {
         console.error("Document Upload Error:", error);
         res.status(500).json({ message: "Failed to process document", error: error.message });
+    }
+});
+
+app.get("/api/documents/:company_id", async (req, res) => {
+    try {
+        const { company_id } = req.params;
+        const company = await Company.findOne({ company_id }).populate('documents_implemented');
+        
+        if (!company) {
+            return res.status(404).json({ message: "Company not found" });
+        }
+
+        res.status(200).json({ documents: company.documents_implemented });
+    } catch (error) {
+        console.error("Error fetching documents:", error);
+        res.status(500).json({ message: "Failed to fetch documents", error: error.message });
+    }
+});
+
+app.get("/api/action-items/:company_id", async (req, res) => {
+    try {
+        const { company_id } = req.params;
+        const company = await Company.findOne({ company_id });
+        if (!company) return res.status(404).json({ message: "Company not found" });
+        res.status(200).json({ action_items: company.pending_action_items || [] });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch action items", error: error.message });
+    }
+});
+
+app.post("/api/action-items/:company_id", async (req, res) => {
+    try {
+        const { company_id } = req.params;
+        const { items, related_regulation } = req.body; // array of items
+        const company = await Company.findOne({ company_id });
+        if (!company) return res.status(404).json({ message: "Company not found" });
+        
+        const newItems = items.map(item => ({
+            document_title: item.document_title,
+            exact_change_instructions: item.exact_change_instructions,
+            related_regulation: related_regulation
+        }));
+        
+        company.pending_action_items.push(...newItems);
+        await company.save();
+        res.status(200).json({ message: "Action items saved", action_items: company.pending_action_items });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to save action items", error: error.message });
+    }
+});
+
+app.delete("/api/action-items/:company_id/:item_id", async (req, res) => {
+    try {
+        const { company_id, item_id } = req.params;
+        const company = await Company.findOne({ company_id });
+        if (!company) return res.status(404).json({ message: "Company not found" });
+        
+        company.pending_action_items = company.pending_action_items.filter(item => item._id.toString() !== item_id);
+        await company.save();
+        res.status(200).json({ message: "Action item removed", action_items: company.pending_action_items });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to remove action item", error: error.message });
     }
 });
 
